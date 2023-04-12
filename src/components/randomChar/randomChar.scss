@@ -28,6 +28,10 @@
         text-transform: uppercase;
     }
     &__descr {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        height: 90px;
+        width: 270px;
         font-size: 14px;
         line-height: 18px;
     }
