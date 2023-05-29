@@ -35,6 +35,12 @@ const RandomChar = () => {
     setError(true);
   }
 
+  function onButtonUpdate() {
+    setLoading(true);
+    setError(false);
+    updateChar();
+  }
+
   useEffect(updateChar, []);
 
   const errorMessage = error ? <ErrorMessage /> : null;
@@ -52,7 +58,9 @@ const RandomChar = () => {
         </p>
         <p className="randomchar__title">Or choose another one</p>
         <button className="button button__main">
-          <div className="inner">try it</div>
+          <div className="inner" onClick={onButtonUpdate}>
+            try it
+          </div>
         </button>
         <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
       </div>

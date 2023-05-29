@@ -3,17 +3,22 @@ import Spinner from "../spinner/spinner.jsx";
 import MarvelService from "../../services/MarvelService.jsx";
 import { useEffect, useState } from "react";
 
-const CharList = () => {
+const CharList = ({ setSelected }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const service = new MarvelService();
-  let id = 0;
 
   function onCharListLoaded(charList) {
     const newDataList = charList.map((char) => {
       return (
-        <li className="char__item" key={id++}>
-          <img src={char.thumbnail} alt={char.thumbnail} />
+        <li
+          className="char__item"
+          key={char.id}
+          onClick={() => {
+            setSelected(char.id);
+          }}
+        >
+          <img src={char.thumbnail} alt={char.name} />
           <div className="char__name">{char.name}</div>
         </li>
       );
@@ -35,7 +40,7 @@ const CharList = () => {
       spinnerArray.push(
         <li
           className="char__item"
-          key={id++}
+          key={i}
           style={{
             padding: "25% 0",
             backgroundColor: "white",
