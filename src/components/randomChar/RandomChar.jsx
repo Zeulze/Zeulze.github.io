@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Spinner from "../spinner/spinner.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
-import errorMessage from "../errorMessage/errorMessage.jsx";
 
 const RandomChar = () => {
   const [loading, setLoading] = useState(true);
