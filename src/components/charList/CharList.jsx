@@ -2,15 +2,18 @@ import "./charList.scss";
 import Spinner from "../spinner/spinner.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
 import MarvelService from "../../services/MarvelService.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const CharList = ({ setSelected }) => {
+const CharList = ({ setSelected, ref }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [error, setError] = useState(false);
   const [offset, setOffset] = useState(210);
   const service = new MarvelService();
+
+  useEffect(onRequest, []);
+  const itemRefs = useRef([]);
 
   function onError() {
     setLoading(false);
@@ -26,14 +29,25 @@ const CharList = ({ setSelected }) => {
     setNewItemLoading(true);
   }
 
+  const focusOnItem = (id) => {
+    itemRefs.current.forEach((item) =>
+      item.classList.remove("char__item_selected")
+    );
+    itemRefs.current[id].classList.add("char__item_selected");
+    itemRefs.current[id].focus();
+  };
+
   function onCharListLoaded(charList) {
-    const newDataList = charList.map((char) => {
+    const newDataList = charList.map((char, index) => {
       return (
         <li
           className="char__item"
+          tabIndex={0}
           key={char.id}
+          ref={(el) => (itemRefs.current[char.id] = el)}
           onClick={() => {
             setSelected(char.id);
+            focusOnItem(char.id);
           }}
         >
           <img src={char.thumbnail} alt={char.name} />
@@ -45,16 +59,14 @@ const CharList = ({ setSelected }) => {
     setData([...data, newDataList]);
     setLoading(false);
     setNewItemLoading(false);
-    setOffset(() => offset + 9);
+    setOffset((prevOffset) => prevOffset + 9);
     setError(false);
   }
 
-  useEffect(onRequest, []);
-
-  const spinnerContent = () => {
-    const spinnerArray = [];
+  const toFillContent = (component) => {
+    const content = [];
     for (let i = 0; i < 9; i++) {
-      spinnerArray.push(
+      content.push(
         <li
           className="char__item"
           key={i}
@@ -63,37 +75,17 @@ const CharList = ({ setSelected }) => {
             backgroundColor: "white",
           }}
         >
-          <Spinner />
+          {component}
         </li>
       );
     }
 
-    return spinnerArray;
+    return content;
   };
 
-  const errorContent = () => {
-    const spinnerArray = [];
-    for (let i = 0; i < 9; i++) {
-      spinnerArray.push(
-        <li
-          className="char__item"
-          key={i}
-          style={{
-            padding: "25% 0",
-            backgroundColor: "white",
-          }}
-        >
-          <ErrorMessage />
-        </li>
-      );
-    }
-
-    return spinnerArray;
-  };
-
-  const spinner = loading ? spinnerContent() : null;
-  const isError = error ? errorContent() : null;
-  const content = !loading || error ? data : null;
+  const spinner = loading ? toFillContent(<Spinner />) : null;
+  const isError = error ? toFillContent(<ErrorMessage />) : null;
+  const content = !loading || !error ? data : null;
 
   return (
     <div className="char__list">
