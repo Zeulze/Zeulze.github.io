@@ -1,32 +1,23 @@
 import "./charList.scss";
 import Spinner from "../spinner/spinner.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
-import MarvelService from "../../services/MarvelService.jsx";
+import useMarvelService from "../../services/MarvelService.jsx";
 import { useEffect, useState, useRef } from "react";
 
-const CharList = ({ setSelected, ref }) => {
+const CharList = ({ setSelected }) => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [newItemLoading, setNewItemLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [offset, setOffset] = useState(210);
-  const service = new MarvelService();
+  const service = useMarvelService();
 
-  useEffect(onRequest, []);
+  useEffect(() => {
+    onRequest(offset, true);
+  }, []);
   const itemRefs = useRef([]);
 
-  function onError() {
-    setLoading(false);
-    setError(true);
-  }
-
-  function onRequest(offset) {
-    onCharListLoading();
-    service.getAllCharacters(offset).then(onCharListLoaded).catch(onError);
-  }
-
-  function onCharListLoading() {
-    setNewItemLoading(true);
+  function onRequest(offset, initial) {
+    initial ? setNewItemLoading(false) : setNewItemLoading(true);
+    service.getAllCharacters(offset).then(onCharListLoaded).catch();
   }
 
   const focusOnItem = (id) => {
@@ -57,10 +48,8 @@ const CharList = ({ setSelected, ref }) => {
     });
 
     setData([...data, newDataList]);
-    setLoading(false);
     setNewItemLoading(false);
     setOffset((prevOffset) => prevOffset + 9);
-    setError(false);
   }
 
   const toFillContent = (component) => {
@@ -83,13 +72,13 @@ const CharList = ({ setSelected, ref }) => {
     return content;
   };
 
-  const spinner = loading ? toFillContent(<Spinner />) : null;
-  const isError = error ? toFillContent(<ErrorMessage />) : null;
-  const content = !loading || !error ? data : null;
+  const spinner =
+    service.loading && !newItemLoading ? toFillContent(<Spinner />) : null;
+  const isError = service.error ? toFillContent(<ErrorMessage />) : null;
 
   return (
     <div className="char__list">
-      <ul className="char__grid">{spinner || isError || content}</ul>
+      <ul className="char__grid">{spinner || isError || data}</ul>
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
