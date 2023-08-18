@@ -3,13 +3,17 @@
         margin-top: 45px;
     }
     &__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, 225px);
-        justify-content: space-between;
-        row-gap: 55px;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 200px 0 200px;
+        justify-content: center;
     }
     &__item {
+        margin: 0 40px 20px 40px;
         transition: 0.3s transform;
+        min-height: 345px;
+        min-width: 225px;
+
         &-img {
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.25);
             width: 225px;
@@ -28,6 +32,11 @@
             line-height: 18px;
             color: rgba(0, 0, 0, 0.6);
             text-transform: uppercase;
+        }
+        &_selected {
+            border: 3px solid #9F0013;
+            border-radius: 3px;
+
         }
         &:hover {
             transform: translateY(-5px);

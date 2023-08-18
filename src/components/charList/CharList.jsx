@@ -78,7 +78,7 @@ const CharList = ({ setSelected }) => {
 
   return (
     <div className="char__list">
-      <ul className="char__grid">{spinner || isError || data}</ul>
+      <ul className="char__grid">{data || spinner || isError}</ul>
       <button
         className="button button__main button__long"
         disabled={newItemLoading}

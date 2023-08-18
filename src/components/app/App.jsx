@@ -2,7 +2,8 @@ import AppHeader from "../appHeader/AppHeader.jsx";
 import RandomChar from "../randomChar/RandomChar.jsx";
 import CharList from "../charList/CharList.jsx";
 import CharInfo from "../charInfo/CharInfo.jsx";
-import { useState } from "react";
+import ComicsList from "../comicsList/ComicsList.jsx";
+import { useState, useEffect } from "react";
 
 import decoration from "../../resources/img/vision.png";
 
@@ -14,16 +15,19 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <AppHeader />
-      <main>
-        <RandomChar />
-        <div className="char__content">
-          <CharList setSelected={setSelectedChar} />
-          <CharInfo selectedChar={selectedChar} />
-        </div>
-        <img className="bg-decoration" src={decoration} alt="vision" />
-      </main>
+    // <div className="app">
+    //   <AppHeader />
+    //   <main>
+    //     <RandomChar />
+    //     <div className="char__content">
+    //       <CharList setSelected={setSelectedChar} />
+    //       <CharInfo selectedChar={selectedChar} />
+    //     </div>
+    //     <img className="bg-decoration" src={decoration} alt="vision" />
+    //   </main>
+    // </div>
+    <div className={"comics"}>
+      <ComicsList />
     </div>
   );
 };

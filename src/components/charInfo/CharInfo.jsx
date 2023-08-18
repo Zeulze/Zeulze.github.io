@@ -19,6 +19,7 @@ const CharInfo = ({ selectedChar }) => {
       return;
     }
 
+    service.clearError();
     service.getCharacter(selectedChar).then(onCharLoaded).catch();
   };
 
