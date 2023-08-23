@@ -19,7 +19,6 @@ const useMarvelService = () => {
     const res = await request(
       `${_apiBase}comics?limit=8&offset=${offset}&${_apiKey}`
     );
-
     return res.data.results.map(_transformComics);
   };
 
@@ -40,7 +39,7 @@ const useMarvelService = () => {
       id: comicsInfo.id,
       title: comicsInfo.title,
       price: price,
-      thumbnail: comicsInfo.thumbnail.path,
+      thumbnail: `${comicsInfo.thumbnail.path}.${comicsInfo.thumbnail.extension}`,
     };
   };
 

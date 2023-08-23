@@ -1,15 +1,12 @@
 import "./comicsList.scss";
-import uw from "../../resources/img/UW.png";
-import xMen from "../../resources/img/x-men.png";
 import { useState, useEffect, useRef } from "react";
 import MarvelService from "../../services/MarvelService.jsx";
-import Skeleton from "../skeleton/Skeleton.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
 import Spinner from "../spinner/spinner.jsx";
 
 const ComicsList = () => {
   const [data, setData] = useState([]);
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(20);
   const [newDataLoading, setNewDataLoading] = useState(false);
 
   const service = MarvelService();
@@ -37,7 +34,11 @@ const ComicsList = () => {
           onClick={() => setFocus(item.id)}
         >
           <a>
-            <img src={xMen} alt={item.title} className="comics__item-img" />
+            <img
+              src={item.thumbnail}
+              alt={item.title}
+              className="comics__item-img"
+            />
             <div className="comics__item-name">{item.name}</div>
             <div className="comics__item-price">{item.price}</div>
           </a>
