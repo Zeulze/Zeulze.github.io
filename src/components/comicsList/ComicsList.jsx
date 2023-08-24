@@ -1,5 +1,6 @@
 import "./comicsList.scss";
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import MarvelService from "../../services/MarvelService.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
 import Spinner from "../spinner/spinner.jsx";
@@ -10,30 +11,25 @@ const ComicsList = () => {
   const [newDataLoading, setNewDataLoading] = useState(false);
 
   const service = MarvelService();
-  const comicsItems = useRef([]);
+  // const comicsItems = useRef([]);
 
   useEffect(() => {
     onComicsLoading(true);
   }, []);
 
-  const setFocus = (id) => {
-    comicsItems.current.forEach((item) => {
-      item.classList.remove("comics__item_selected");
-    });
-    comicsItems.current[id].classList.add("comics__item_selected");
-    comicsItems.current[id].focus();
-  };
+  // const setFocus = (id) => {
+  //   comicsItems.current.forEach((item) => {
+  //     item.classList.remove("comics__item_selected");
+  //   });
+  //   comicsItems.current[id].classList.add("comic s__item_selected");
+  //   comicsItems.current[id].focus();
+  // };
 
   const onComicsListLoaded = (comicsList) => {
     const newComicsList = comicsList.map((item) => {
       return (
-        <li
-          className="comics__item"
-          key={item.id}
-          ref={(el) => (comicsItems.current[item.id] = el)}
-          onClick={() => setFocus(item.id)}
-        >
-          <a>
+        <li className="comics__item" key={item.id}>
+          <Link to={`${item.id}`}>
             <img
               src={item.thumbnail}
               alt={item.title}
@@ -41,7 +37,7 @@ const ComicsList = () => {
             />
             <div className="comics__item-name">{item.name}</div>
             <div className="comics__item-price">{item.price}</div>
-          </a>
+          </Link>
         </li>
       );
     });

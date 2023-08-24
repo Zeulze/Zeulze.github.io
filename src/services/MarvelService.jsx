@@ -22,6 +22,11 @@ const useMarvelService = () => {
     return res.data.results.map(_transformComics);
   };
 
+  const getComic = async (id) => {
+    const res = await request(`${_apiBase}comics/${id}?${_apiKey}`);
+    return _transformComics(res.data.results[0]);
+  };
+
   const getCharacter = async (id) => {
     const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
 
@@ -31,26 +36,27 @@ const useMarvelService = () => {
   };
 
   const _transformComics = (comicsInfo) => {
-    const price =
-      comicsInfo.prices[0].price !== 0
-        ? `${comicsInfo.prices[0].price}$`
-        : "NOT AVAILABLE";
     return {
       id: comicsInfo.id,
       title: comicsInfo.title,
-      price: price,
+      price: comicsInfo.prices[0].price
+        ? `${comicsInfo.prices[0].price}$`
+        : "NOT AVAILABLE",
       thumbnail: `${comicsInfo.thumbnail.path}.${comicsInfo.thumbnail.extension}`,
+      description: comicsInfo.description || "There's no description",
+      language: comicsInfo.textObjects.language || "en-us",
+      pageCount: comicsInfo.pageCount
+        ? `${comicsInfo.pageCount} p.`
+        : "No information about the number of pages",
     };
   };
 
   const _transformCharacter = (characterInfo) => {
-    const desc = !!characterInfo.description
-      ? `${characterInfo.description}`
-      : `There is no data about this character, sorry :(`;
-
     return {
       name: characterInfo.name,
-      description: desc,
+      description:
+        characterInfo.description ||
+        `There is no data about this character, sorry :(`,
       thumbnail: `${characterInfo.thumbnail.path}.${characterInfo.thumbnail.extension}`,
       homepage: characterInfo.urls[0].url,
       wiki: characterInfo.urls[1].url,
@@ -66,6 +72,7 @@ const useMarvelService = () => {
     getAllCharacters,
     clearError,
     getComicsList,
+    getComic,
   };
 };
 
