@@ -1,6 +1,6 @@
 import "./charList.scss";
 import useMarvelService from "../../services/MarvelService.jsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Spinner from "../spinner/spinner.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
 
@@ -78,9 +78,14 @@ const CharList = ({ setSelected }) => {
     return <ul className="char__grid">{renderedItems}</ul>;
   };
 
+  const elements = useMemo(
+    () => setContent(service.process, () => renderItems(data), newItemLoading),
+    [data, newItemLoading]
+  );
+
   return (
     <div className="char__list">
-      {setContent(service.process, () => renderItems(data), newItemLoading)}
+      {elements}
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
