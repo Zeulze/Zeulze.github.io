@@ -2,9 +2,7 @@ import "./charInfo.scss";
 import { useState } from "react";
 import { useEffect } from "react";
 import useMarvelService from "../../services/MarvelService.jsx";
-import Spinner from "../spinner/spinner.jsx";
-import Skeleton from "../skeleton/Skeleton.jsx";
-import ErrorMessage from "../errorMessage/errorMessage.jsx";
+import { setContent } from "../../utils/setContent.jsx";
 
 const CharInfo = ({ selectedChar }) => {
   const [char, setChar] = useState(null);
@@ -20,33 +18,23 @@ const CharInfo = ({ selectedChar }) => {
     }
 
     service.clearError();
-    service.getCharacter(selectedChar).then(onCharLoaded).catch();
+    service
+      .getCharacter(selectedChar)
+      .then(onCharLoaded)
+      .then(() => service.setProcess("confirmed"));
   };
 
   useEffect(updateChar, [selectedChar]);
 
-  const skeleton =
-    char || service.loading || service.error ? null : <Skeleton />;
-  const errorMessage = service.error ? <ErrorMessage /> : null;
-  const spinner = service.loading ? <Spinner /> : null;
-  const content = !(service.error || service.loading || !char) ? (
-    <View char={char} />
-  ) : null;
-
   return (
-    <div className="char__info">
-      {content}
-      {errorMessage}
-      {skeleton}
-      {spinner}
-    </div>
+    <div className="char__info">{setContent(service.process, View, char)}</div>
   );
 };
 
-const View = ({ char }) => {
+const View = ({ data }) => {
   let content;
-  if (char.comics.length) {
-    content = char.comics.map((item, index) => {
+  if (data.comics.length) {
+    content = data.comics.map((item, index) => {
       if (index > 9) return null;
       return (
         <li className="char__comics-item" key={index}>
@@ -61,20 +49,20 @@ const View = ({ char }) => {
   return (
     <>
       <div className="char__basics">
-        <img src={char.thumbnail} alt={char.name} />
+        <img src={data.thumbnail} alt={data.name} />
         <div>
-          <div className="char__info-name">{char.name}</div>
+          <div className="char__info-name">{data.name}</div>
           <div className="char__btns">
-            <a href={char.homepage} className="button button__main">
+            <a href={data.homepage} className="button button__main">
               <div className="inner">homepage</div>
             </a>
-            <a href={char.wiki} className="button button__secondary">
+            <a href={data.wiki} className="button button__secondary">
               <div className="inner">Wiki</div>
             </a>
           </div>
         </div>
       </div>
-      <div className="char__descr">{char.description}</div>
+      <div className="char__descr">{data.description}</div>
       <div className="char__comics">Comics:</div>
       <ul className="char__comics-list">{content}</ul>
     </>

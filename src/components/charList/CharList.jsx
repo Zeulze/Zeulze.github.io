@@ -1,23 +1,42 @@
 import "./charList.scss";
+import useMarvelService from "../../services/MarvelService.jsx";
+import { useEffect, useRef, useState } from "react";
 import Spinner from "../spinner/spinner.jsx";
 import ErrorMessage from "../errorMessage/errorMessage.jsx";
-import useMarvelService from "../../services/MarvelService.jsx";
-import { useEffect, useState, useRef } from "react";
+
+const setContent = (process, Component, newItemLoading) => {
+  switch (process) {
+    case "waiting":
+      return <Spinner />;
+    case "loading":
+      return newItemLoading ? <Component /> : <Spinner />;
+    case "confirmed":
+      return <Component />;
+    case "error":
+      return <ErrorMessage />;
+    default:
+      throw new Error("Unexpected process state");
+  }
+};
 
 const CharList = ({ setSelected }) => {
   const [data, setData] = useState([]);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
+  const itemRefs = useRef([]);
+
   const service = useMarvelService();
 
   useEffect(() => {
     onRequest(offset, true);
   }, []);
-  const itemRefs = useRef([]);
 
   function onRequest(offset, initial) {
     initial ? setNewItemLoading(false) : setNewItemLoading(true);
-    service.getAllCharacters(offset).then(onCharListLoaded).catch();
+    service
+      .getAllCharacters(offset)
+      .then(onCharListLoaded)
+      .then(() => service.setProcess("confirmed"));
   }
 
   const focusOnItem = (id) => {
@@ -28,17 +47,26 @@ const CharList = ({ setSelected }) => {
     itemRefs.current[id].focus();
   };
 
-  function onCharListLoaded(charList) {
-    const newDataList = charList.map((char, index) => {
+  const onCharListLoaded = (newDataList) => {
+    let ended = false;
+    if (newDataList.length < 9) ended = true;
+
+    setData([...data, ...newDataList]);
+    setNewItemLoading(false);
+    setOffset((prevOffset) => prevOffset + 9);
+  };
+
+  const renderItems = (items) => {
+    const renderedItems = items.map((char, i) => {
       return (
         <li
           className="char__item"
           tabIndex={0}
-          key={char.id}
-          ref={(el) => (itemRefs.current[char.id] = el)}
+          key={i}
+          ref={(el) => (itemRefs.current[i] = el)}
           onClick={() => {
             setSelected(char.id);
-            focusOnItem(char.id);
+            focusOnItem(i);
           }}
         >
           <img src={char.thumbnail} alt={char.name} />
@@ -47,42 +75,12 @@ const CharList = ({ setSelected }) => {
       );
     });
 
-    setData([...data, newDataList]);
-    setNewItemLoading(false);
-    setOffset((prevOffset) => prevOffset + 9);
-  }
-
-  const toFillContent = (component) => {
-    const content = [];
-    for (let i = 0; i < 9; i++) {
-      content.push(
-        <li
-          className="char__item"
-          key={i}
-          style={{
-            padding: "25% 0",
-            backgroundColor: "white",
-          }}
-        >
-          {component}
-        </li>
-      );
-    }
-
-    return content;
+    return <ul className="char__grid">{renderedItems}</ul>;
   };
-
-  const spinner =
-    service.loading && !newItemLoading ? toFillContent(<Spinner />) : null;
-  const isError = service.error ? toFillContent(<ErrorMessage />) : null;
 
   return (
     <div className="char__list">
-      <ul className="char__grid">
-        {data}
-        {spinner}
-        {isError}
-      </ul>
+      {setContent(service.process, () => renderItems(data), newItemLoading)}
       <button
         className="button button__main button__long"
         disabled={newItemLoading}

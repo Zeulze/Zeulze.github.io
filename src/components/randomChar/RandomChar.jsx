@@ -3,8 +3,7 @@ import mjolnir from "../../resources/img/mjolnir.png";
 import useMarvelService from "../../services/MarvelService.jsx";
 import { useState } from "react";
 import { useEffect } from "react";
-import Spinner from "../spinner/spinner.jsx";
-import ErrorMessage from "../errorMessage/errorMessage.jsx";
+import { setContent } from "../../utils/setContent.jsx";
 
 const RandomChar = () => {
   const [randomCharState, setRandomCharState] = useState({
@@ -23,7 +22,10 @@ const RandomChar = () => {
 
   function updateChar() {
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    marvelService.getCharacter(id).then(onCharLoaded);
+    marvelService
+      .getCharacter(id)
+      .then(onCharLoaded)
+      .then(() => marvelService.setProcess("confirmed"));
   }
 
   function onButtonUpdate() {
@@ -33,15 +35,9 @@ const RandomChar = () => {
 
   useEffect(updateChar, []);
 
-  const errorMessage = marvelService.error ? <ErrorMessage /> : null;
-  const spinner = marvelService.loading ? <Spinner /> : null;
-  const content = !(marvelService.error || marvelService.loading) ? (
-    <View char={randomCharState} />
-  ) : null;
-
   return (
     <div className="randomchar">
-      {errorMessage || spinner || content}
+      {setContent(marvelService.process, View, randomCharState)}
       <div className="randomchar__static">
         <p className="randomchar__title">
           Random character for today!
@@ -49,7 +45,10 @@ const RandomChar = () => {
           Do you want to get to know him better?
         </p>
         <p className="randomchar__title">Or choose another one</p>
-        <button className="button button__main">
+        <button
+          className="button button__main"
+          disabled={marvelService.process === "loading"}
+        >
           <div className="inner" onClick={onButtonUpdate}>
             try it
           </div>
@@ -60,22 +59,22 @@ const RandomChar = () => {
   );
 };
 
-const View = ({ char }) => {
+const View = ({ data }) => {
   return (
     <div className="randomchar__block">
       <img
-        src={char.thumbnail}
+        src={data.thumbnail}
         alt="Random character"
         className="randomchar__img"
       />
       <div className="randomchar__info">
-        <p className="randomchar__name">{char.name}</p>
-        <p className="randomchar__descr">{char.description}</p>
+        <p className="randomchar__name">{data.name}</p>
+        <p className="randomchar__descr">{data.description}</p>
         <div className="randomchar__btns">
-          <a href={char.homepage} className="button button__main">
+          <a href={data.homepage} className="button button__main">
             <div className="inner">homepage</div>
           </a>
-          <a href={char.wiki} className="button button__secondary">
+          <a href={data.wiki} className="button button__secondary">
             <div className="inner">Wiki</div>
           </a>
         </div>

@@ -1,7 +1,7 @@
 import useHttp from "../hooks/http.hook.js";
 
 const useMarvelService = () => {
-  const { loading, error, request, clearError } = useHttp();
+  const { request, clearError, process, setProcess } = useHttp();
 
   const _apiBase = "https://gateway.marvel.com:443/v1/public/";
   const _apiKey = "apikey=d6acbece0f2e9a54d9ebe08856f75de1";
@@ -42,7 +42,7 @@ const useMarvelService = () => {
       price: comicsInfo.prices[0].price
         ? `${comicsInfo.prices[0].price}$`
         : "NOT AVAILABLE",
-      thumbnail: `${comicsInfo.thumbnail.path}.${comicsInfo.thumbnail.extension}`,
+      img: `${comicsInfo.thumbnail.path}.${comicsInfo.thumbnail.extension}`,
       description: comicsInfo.description || "There's no description",
       language: comicsInfo.textObjects.language || "en-us",
       pageCount: comicsInfo.pageCount
@@ -66,13 +66,13 @@ const useMarvelService = () => {
   };
 
   return {
-    loading,
-    error,
     getCharacter,
     getAllCharacters,
     clearError,
     getComicsList,
     getComic,
+    process,
+    setProcess,
   };
 };
 
